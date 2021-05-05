@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { AuthContext } from '../AuthContext';
 import {
   TheContent,
   TheSidebar,
@@ -6,7 +7,12 @@ import {
   TheHeader
 } from './index'
 
-const TheLayout = () => {
+const TheLayout = ({history:{push}}) => {
+
+  // const {user} = useContext(AuthContext);
+  // if(!user){
+  //   push("/login")
+  // }
 
   return (
     <div className="c-app c-default-layout">

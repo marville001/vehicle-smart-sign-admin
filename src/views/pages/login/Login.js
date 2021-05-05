@@ -1,5 +1,4 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useCallback, useState } from "react";
 import {
   CButton,
   CCard,
@@ -12,29 +11,74 @@ import {
   CInputGroup,
   CInputGroupPrepend,
   CInputGroupText,
-  CRow
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
+  CRow,
+} from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import _app from "../../../firebase";
 
-const Login = () => {
+const Login = ({ history }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const _login = () => {
+    if (email == "" || password == "") {
+      updateError("All fields are required");
+    } else if (
+      !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        email
+      )
+    ) {
+      updateError("Invalid email");
+    } else if (password.length < 8) {
+      updateError("Password should be 8 characters or more");
+    } else {
+      handleLogin();
+    }
+  };
+
+  const updateError = (error) => {
+    setError(error);
+    setTimeout(() => {
+      setError("");
+    }, 3000);
+  };
+
+  const handleLogin = async () => {
+    console.log(email, password);
+    try {
+      await _app.auth().signInWithEmailAndPassword(email, password);
+      history.push("/");
+
+    } catch (error) {
+      console.log(error.code);
+    }
+  };
+
   return (
     <div className="c-app c-default-layout flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md="8">
+          <CCol md="5">
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
                   <CForm>
                     <h1>Login</h1>
                     <p className="text-muted">Sign In to your account</p>
+                    {error && <div className="error">{error}</div>}
                     <CInputGroup className="mb-3">
                       <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cil-user" />
-                        </CInputGroupText>
+                        <CInputGroupText>@</CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="text" placeholder="Username" autoComplete="username" />
+                      <CInput
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email"
+                        placeholder="email"
+                        autoComplete="email"
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupPrepend>
@@ -42,29 +86,32 @@ const Login = () => {
                           <CIcon name="cil-lock-locked" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="password" placeholder="Password" autoComplete="current-password" />
+                      <CInput
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        type="password"
+                        placeholder="Password"
+                        autoComplete="current-password"
+                      />
                     </CInputGroup>
                     <CRow>
                       <CCol xs="6">
-                        <CButton color="primary" className="px-4">Login</CButton>
+                        <CButton
+                          onClick={_login}
+                          color="primary"
+                          className="px-4"
+                        >
+                          Login
+                        </CButton>
                       </CCol>
                       <CCol xs="6" className="text-right">
-                        <CButton color="link" className="px-0">Forgot password?</CButton>
+                        <CButton color="link" className="px-0">
+                          Forgot password?
+                        </CButton>
                       </CCol>
                     </CRow>
                   </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5 d-md-down-none" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Sign up</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                      labore et dolore magna aliqua.</p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>Register Now!</CButton>
-                    </Link>
-                  </div>
                 </CCardBody>
               </CCard>
             </CCardGroup>
@@ -72,7 +119,7 @@ const Login = () => {
         </CRow>
       </CContainer>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

@@ -30,7 +30,7 @@ const _nav =  [
       {
         _tag: 'CSidebarNavItem',
         name: 'Add User',
-        to: '/users',
+        to: '/new_user',
       },
     ],
   },
